@@ -1,4 +1,5 @@
 # 🏎️ Nissan X-Trail T30 "Hybrid" Throttle & Idle Control System
+
 ### Project Aim: Solving the Electronic Throttle Body (ETB) Failure
 The Nissan X-Trail T30 (QR20DE) is notorious for Throttle Body motor failures which lead to expensive repairs or dangerous "Limp Mode" events. This project converts the system into a **Manual Cable-Driven Throttle** while using an **Arduino-controlled Servo** to manage the critical idle air compensation (AC, Power Steering, and Cold Starts).
 
@@ -13,17 +14,20 @@ To bypass the electronic motor, the throttle body must be physically modified to
 3. **The Helper Servo:** A high-torque servo is mounted via a 3D-printed bracket. Its arm is positioned to "push" the throttle open slightly (0–15%) to maintain idle.
 4. **Safety Return Spring:** **CRITICAL.** Install a heavy-duty external spring to ensure the throttle snaps shut if the cable or servo fails.
 
-
+### **Reference Photos**
+| Throttle Modification | Engine Bay Layout | Gas Pedal Linkage |
+| :---: | :---: | :---: |
+| ![Throttle](throttle1.jpg) | ![Engine](engine-bay.jpg) | ![Pedal](gas-pedal.jpg) |
 
 ---
 
 ## 🔌 2. Wiring & Electronics
-The Arduino Nano acts as the "Idle Control Unit," monitoring engine loads and adjusting the servo position in real-time.
+The Arduino acts as the "Idle Control Unit," monitoring engine loads and adjusting the servo position in real-time.
 
 ### **Complete Wiring Table**
 | Function | Pin | Component | Note |
 | :--- | :--- | :--- | :--- |
-| **RPM Input** | D2 | PC817 Optocoupler | Tapped from Ignition Coil (High Voltage Protection) |
+| **RPM Input** | D2 | PC817 Optocoupler | Tapped from Ignition Coil |
 | **PSP Switch** | D3 | OEM Pressure Switch | Detects Power Steering load |
 | **AC Signal** | D4 | AC Clutch Wire | Detects AC Compressor load |
 | **Temp Sensor** | D6 | DS18B20 | Reads engine coolant temperature |
@@ -32,7 +36,7 @@ The Arduino Nano acts as the "Idle Control Unit," monitoring engine loads and ad
 | **Buzzer** | D11 | Active 5V Buzzer | Stall Alarm (RPM < 550) |
 | **Voltage** | A0 | Resistor Divider | Optional Battery Monitor (30k/7.5k) |
 
-
+![Wiring Reference](/images/Arduino_Reference_Model.png)
 
 ---
 
@@ -43,95 +47,72 @@ The code uses a simplified PID loop to maintain target RPM:
 * **AC Compensation:** +150 RPM
 * **Steering Compensation:** +100 RPM
 
-> **Note:** The code includes an EEPROM save feature. Long-press the **MENU** button to save your custom idle settings.
+### **Dashboard Interface States**
+| Boot Screen | Main Dash | Menu System | Settings |
+| :---: | :---: | :---: | :---: |
+| ![Dash1](/images/Display1.png) | ![Dash2](/images/Display2.png) | ![Dash3](/images/Display3.png) | ![Dash4](/images/Display4.png) |
 
 ---
 
 ## 📐 4. 3D Printable Designs
-This project requires two specific 3D prints to handle the environment:
+This project includes a custom enclosure for the Arduino Uno/Nano and the OLED display.
 
-### **A. Engine Bay Servo Bracket**
-* **Material:** MUST be **ASA or ABS** (PLA will melt).
-* **Function:** Holds the MG996R servo rigid against the engine vibration.
-* **Infill:** 40% Gyroid for maximum structural strength.
+### **Control Unit Assembly**
+| Base | Lid | Final Assembly |
+| :---: | :---: | :---: |
+| ![Base](/images/Base.png) | ![Lid](/images/Lid_Plain.png) | ![Full](/images/Assembled.jpg) |
 
-### **B. Dashboard Display Casing**
-* **Material:** PETG or ABS.
-* **Features:** Mounts for the 0.96" OLED, 3 tactile buttons (Menu/Up/Down), and the Arduino Nano.
-* **Port:** Includes a side-access hole for the Mini-USB programming port.
-
-
+### **Download STL Files**
+* 📦 **Main Case:** [Base.stl](/3D-files/Uno-case/Base.stl) | [Lid.stl](/3D-files/Uno-case/Lid_Plain.stl) | [Lock.stl](/3D-files/Uno-case/E-Lock.stl)
+* 📦 **Buttons:** [Button_Button.stl](/3D-files/Uno-case/Button_Button.stl)
+* 📦 **OLED Mount:** [OLED_Case_Front.stl](/3D-files/Display/OLED-SSD1306-case-front.stl) | [OLED_Case_Back.stl](/3D-files/Display/OLED-SSD1306-case-back.stl)
 
 ---
 
 ## 🚀 5. Installation & Calibration
-1. **Flash:** Upload the `XTrail_T30_IdleControl.ino` to your Arduino Nano.
-2. **Mounting:** Bolt the Servo Bracket near the throttle body. Connect the linkage.
-3. **Power:** Use a **12V to 5V (3A) Buck Converter**. The car's 12V is too "dirty" and powerful for the Arduino's internal regulator.
-4. **Test:** With the engine OFF, turn the key. Use the UP/DOWN buttons to test if the servo moves the throttle butterfly smoothly.
+1. **Flash:** Upload the `XTrail_T30_IdleControl.ino` to your Arduino.
+2. **Mounting:** Bolt the Servo Bracket near the throttle body.
+3. **Power:** Use a **12V to 5V (3A) Buck Converter**.
 
-
+### **Working Prototype**
+![Working Model](working-model-table.jpg)
+*(Video of operations coming soon)*
 
 ---
 
-## ⚠️ Safety Warning
-This is a custom mechanical modification. 
-* Always ensure your **Mechanical Return Spring** is stronger than the servo motor.
-* Use a **1A Fuse** on the 12V power supply to the Arduino.
-* **Testing:** Perform your first start in Neutral with the handbrake engaged.
-
 ## 🚦 6. First Start & Calibration Guide
-Before turning the key, follow this diagnostic checklist to prevent high-rev surges or mechanical binding.
-
-### **Step 1: Mechanical "Dry Run" (Engine OFF)**
-1. Power the Arduino via USB or the 5V Buck converter (Key in 'ON' position, Engine 'OFF').
-2. Use the **UP/DOWN** buttons on your control box to manually move the servo.
-3. **Check for Binding:** Ensure the linkage moves freely from 0% to 20% throttle.
-4. **The Snap Test:** Open the throttle manually by hand and let go. The external return spring **must** be strong enough to pull the servo back to the closed position.
-
-
+### **Step 1: Mechanical "Dry Run"**
+* Use the **UP/DOWN** buttons to move the servo.
+* ![Calibration](/images/Lid_Marked.png)
+* **The Snap Test:** Ensure the external return spring pulls the throttle shut even if the servo is active.
 
 ### **Step 2: Sensor Verification**
-Check the OLED display for the following readings before cranking:
-* **TMP:** Should match ambient temperature (e.g., 25-30°C).
-* **BAT:** Should read ~12.4V to 12.6V.
-* **RPM:** Should read `0`.
-* **AC/STR:** Toggle the AC switch and turn the steering wheel; the screen should update to `ON` for each.
-
-### **Step 3: The "First Crank"**
-1. Have an assistant ready to turn the key while you watch the throttle body.
-2. If the engine revs above 2000 RPM instantly, **KILL THE IGNITION**. This means your `baseIdle` servo position is physically too open.
-3. Once idling, let the engine reach 80°C. The `TMP` sensor will trigger the transition from `ColdIdle` (1100) to `BaseIdle` (750).
+Check OLED for:
+* **TMP:** Ambient temp.
+* **BAT:** ~12.6V.
+* **RPM:** `0` (Engine off).
 
 ---
 
 ## ⚖️ 7. PID Tuning & Troubleshooting
-If the idle "hunts" (RPM bounces up and down) or "lags" (drops too low when AC turns on), adjust the variables in the `XTrail_T30_IdleControl.ino` file:
-
-| Variable | Default | If RPM Bounces... | If RPM is Slow to React... |
+| Variable | Default | If RPM Bounces... | If RPM is Slow... |
 | :--- | :--- | :--- | :--- |
-| **Kp** (Proportional) | `0.35` | Decrease value | Increase value |
-| **Ki** (Integral) | `0.02` | Decrease value | Increase value |
-| **Kd** (Derivative) | `0.08` | Increase value | Decrease value |
+| **Kp** | `0.35` | Decrease value | Increase value |
+| **Ki** | `0.02` | Decrease value | Increase value |
+| **Kd** | `0.08` | Increase value | Decrease value |
 
-
-
-### **Troubleshooting "Ghost" Signals**
-* **Erratic RPM:** Usually caused by electrical noise from the ignition coils. Ensure your **PC817 Optocoupler** is wired correctly and the wires are away from the spark plug leads.
-* **Servo Jitter:** Ensure you have a **470µF Capacitor** across the Servo’s +5V and GND lines to smooth out voltage spikes.
+![Diagnostic](/images/Screen_Shot_2015-04-07_at_5.00.05_PM.png)
 
 ---
 
-## 🛠️ 8. Maintenance Schedule
-* **Every 5,000km:** Inspect the welded shaft and pulley for hairline cracks.
-* **Every 10,000km:** Lubricate the throttle cable and servo linkage with dry PTFE spray.
-* **Summer/Winter:** You may want to use the **MENU** to adjust the `ColdIdle` target if you live in a climate with extreme temperature swings.
-
----
+## ⚠️ Safety Warning
+* Always ensure your **Mechanical Return Spring** is stronger than the servo motor.
+* Use a **1A Fuse** on the 12V power supply.
+* **Testing:** Perform your first start in Neutral with the handbrake engaged.
 
 ---
 
 ## 🤝 Contributing
-If you have improved the PID tuning or designed a better bracket, feel free to submit a Pull Request! or email me on jmwakideu@jaylansolutions.co.ke
+Built by **Jay Overlander**. If you have improved the PID tuning or designed a better bracket, feel free to submit a Pull Request or email me at: **jmwakideu@jaylansolutions.co.ke**
 
 ---

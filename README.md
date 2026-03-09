@@ -70,6 +70,8 @@ This project requires two specific 3D prints to handle the environment:
 3. **Power:** Use a **12V to 5V (3A) Buck Converter**. The car's 12V is too "dirty" and powerful for the Arduino's internal regulator.
 4. **Test:** With the engine OFF, turn the key. Use the UP/DOWN buttons to test if the servo moves the throttle butterfly smoothly.
 
+
+
 ---
 
 ## ⚠️ Safety Warning
@@ -78,9 +80,58 @@ This is a custom mechanical modification.
 * Use a **1A Fuse** on the 12V power supply to the Arduino.
 * **Testing:** Perform your first start in Neutral with the handbrake engaged.
 
+## 🚦 6. First Start & Calibration Guide
+Before turning the key, follow this diagnostic checklist to prevent high-rev surges or mechanical binding.
+
+### **Step 1: Mechanical "Dry Run" (Engine OFF)**
+1. Power the Arduino via USB or the 5V Buck converter (Key in 'ON' position, Engine 'OFF').
+2. Use the **UP/DOWN** buttons on your control box to manually move the servo.
+3. **Check for Binding:** Ensure the linkage moves freely from 0% to 20% throttle.
+4. **The Snap Test:** Open the throttle manually by hand and let go. The external return spring **must** be strong enough to pull the servo back to the closed position.
+
+
+
+### **Step 2: Sensor Verification**
+Check the OLED display for the following readings before cranking:
+* **TMP:** Should match ambient temperature (e.g., 25-30°C).
+* **BAT:** Should read ~12.4V to 12.6V.
+* **RPM:** Should read `0`.
+* **AC/STR:** Toggle the AC switch and turn the steering wheel; the screen should update to `ON` for each.
+
+### **Step 3: The "First Crank"**
+1. Have an assistant ready to turn the key while you watch the throttle body.
+2. If the engine revs above 2000 RPM instantly, **KILL THE IGNITION**. This means your `baseIdle` servo position is physically too open.
+3. Once idling, let the engine reach 80°C. The `TMP` sensor will trigger the transition from `ColdIdle` (1100) to `BaseIdle` (750).
+
+---
+
+## ⚖️ 7. PID Tuning & Troubleshooting
+If the idle "hunts" (RPM bounces up and down) or "lags" (drops too low when AC turns on), adjust the variables in the `XTrail_T30_IdleControl.ino` file:
+
+| Variable | Default | If RPM Bounces... | If RPM is Slow to React... |
+| :--- | :--- | :--- | :--- |
+| **Kp** (Proportional) | `0.35` | Decrease value | Increase value |
+| **Ki** (Integral) | `0.02` | Decrease value | Increase value |
+| **Kd** (Derivative) | `0.08` | Increase value | Decrease value |
+
+
+
+### **Troubleshooting "Ghost" Signals**
+* **Erratic RPM:** Usually caused by electrical noise from the ignition coils. Ensure your **PC817 Optocoupler** is wired correctly and the wires are away from the spark plug leads.
+* **Servo Jitter:** Ensure you have a **470µF Capacitor** across the Servo’s +5V and GND lines to smooth out voltage spikes.
+
+---
+
+## 🛠️ 8. Maintenance Schedule
+* **Every 5,000km:** Inspect the welded shaft and pulley for hairline cracks.
+* **Every 10,000km:** Lubricate the throttle cable and servo linkage with dry PTFE spray.
+* **Summer/Winter:** You may want to use the **MENU** to adjust the `ColdIdle` target if you live in a climate with extreme temperature swings.
+
+---
+
 ---
 
 ## 🤝 Contributing
-Built by **Jay Overlander**. If you have improved the PID tuning or designed a better bracket, feel free to submit a Pull Request!
+If you have improved the PID tuning or designed a better bracket, feel free to submit a Pull Request! or email me on jmwakideu@jaylansolutions.co.ke
 
 ---
